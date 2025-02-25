@@ -49,9 +49,11 @@ private extension ReviewsViewModel {
         do {
             let data = try result.get()
             let reviews = try decoder.decode(Reviews.self, from: data)
+            
             state.items += reviews.items.map(makeReviewItem)
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
+            state.totalReviews = reviews.count
         } catch {
             state.shouldLoad = true
         }
@@ -93,7 +95,6 @@ private extension ReviewsViewModel {
         )
         return item
     }
-
 }
 
 // MARK: - UITableViewDataSource
