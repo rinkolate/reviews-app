@@ -53,7 +53,7 @@ private extension ReviewsViewModel {
             state.items += reviews.items.map(makeReviewItem)
             state.offset += state.limit
             state.shouldLoad = state.offset < reviews.count
-            state.totalReviews = reviews.count
+            state.totalReviews = state.shouldLoad ? state.offset : reviews.count
         } catch {
             state.shouldLoad = true
         }
