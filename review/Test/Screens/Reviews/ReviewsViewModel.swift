@@ -22,7 +22,6 @@ final class ReviewsViewModel: NSObject {
         self.ratingRenderer = ratingRenderer
         self.decoder = decoder
     }
-
 }
 
 // MARK: - Internal
@@ -91,7 +90,9 @@ private extension ReviewsViewModel {
             rating: rating,
             reviewText: reviewText,
             created: created,
-            onTapShowMore: showMoreReview
+            onTapShowMore: { [weak self] id in
+                self?.showMoreReview(with: id)
+            }
         )
         return item
     }

@@ -40,8 +40,9 @@ private extension ReviewsViewController {
     
     func setupViewModel() {
         viewModel.onStateChange = { [weak reviewsView] state in
-            reviewsView?.tableView.reloadData()
-            reviewsView?.updateFooter(with: state.totalReviews)
+            guard let reviewsView = reviewsView else { return }
+            reviewsView.tableView.reloadData()
+            reviewsView.updateFooter(with: state.totalReviews)
         }
     }
 
