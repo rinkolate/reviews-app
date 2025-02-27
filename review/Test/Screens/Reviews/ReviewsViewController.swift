@@ -2,7 +2,7 @@ import UIKit
 
 final class ReviewsViewController: UIViewController {
 
-  private lazy var reviewsView = makeReviewsView()
+  private lazy var reviewsView: DisplaysReviews = ReviewsView()
   private let viewModel: ReviewsViewModel
 
   init(viewModel: ReviewsViewModel) {
@@ -16,6 +16,7 @@ final class ReviewsViewController: UIViewController {
 
   override func loadView() {
     view = reviewsView
+    reviewsView.delegate = self
     title = "Отзывы"
   }
 
@@ -26,23 +27,22 @@ final class ReviewsViewController: UIViewController {
   }
 }
 
+extension ReviewsViewController: ReviewsViewDelegate {
+  func returnConfiguration() -> ReviewsViewModel {
+    return viewModel
+  }
+}
+
 // MARK: - Private
 
 private extension ReviewsViewController {
-
-  func makeReviewsView() -> ReviewsView {
-    let reviewsView = ReviewsView()
-    reviewsView.tableView.delegate = viewModel
-    reviewsView.tableView.dataSource = viewModel
-    return reviewsView
-  }
     
   func setupViewModel() {
     viewModel.onStateChange = { [weak self] state in
       guard let self else {
         return
       }
-      reviewsView.tableView.reloadData()
+      reviewsView.reloadTableView()
       reviewsView.updateFooter(with: state.totalReviews)
     }
   }
