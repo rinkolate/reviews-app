@@ -1,8 +1,11 @@
+
 import UIKit
 
 protocol ReviewsPresentationLogic: UITableViewDelegate, UITableViewDataSource {
+
   func getReviews()
   func getState() -> ReviewsViewModelState
+
 }
 
 /// Класс, описывающий бизнес-логику экрана отзывов.
@@ -11,7 +14,9 @@ final class ReviewsViewModel: NSObject {
   typealias State = ReviewsViewModelState
 
   private weak var viewController: ReviewsDisplayLogic?
+
   private var state: State
+
   private let reviewsProvider: ProvidesReviews
   private let ratingRenderer: RatingRenderer
   private let decoder: JSONDecoder
@@ -29,12 +34,13 @@ final class ReviewsViewModel: NSObject {
     self.ratingRenderer = ratingRenderer
     self.decoder = decoder
   }
+
 }
 
 // MARK: - ReviewsPresentationLogic
 
 extension ReviewsViewModel: ReviewsPresentationLogic {
-  
+
   /// Метод получения отзывов.
   func getReviews() { Task {
     do {
@@ -52,8 +58,9 @@ extension ReviewsViewModel: ReviewsPresentationLogic {
   
   /// Метод передачи состояния View Model-и
   func getState() -> ReviewsViewModelState {
-    return state
+    state
   }
+
 }
 
 // MARK: - Private
@@ -86,6 +93,7 @@ private extension ReviewsViewModel {
     state.items[index] = item
     //await viewController?.updateView()
   }
+
 }
 
 // MARK: - Items
@@ -114,6 +122,7 @@ private extension ReviewsViewModel {
     )
     return item
   }
+
 }
 
 // MARK: - UITableViewDataSource
@@ -130,6 +139,7 @@ extension ReviewsViewModel: UITableViewDataSource {
     config.update(cell: cell)
     return cell
   }
+
 }
 
 // MARK: - UITableViewDelegate
@@ -165,4 +175,5 @@ extension ReviewsViewModel: UITableViewDelegate {
     let remainingDistance = contentHeight - viewHeight - targetOffsetY
     return remainingDistance <= triggerDistance
   }
+
 }

@@ -1,3 +1,4 @@
+
 import UIKit
 
 protocol ReviewsDisplayLogic: AnyObject {
@@ -10,6 +11,7 @@ protocol ReviewsDisplayLogic: AnyObject {
 final class ReviewsViewController: UIViewController {
 
   private lazy var reviewsView: DisplaysReviews = ReviewsView()
+
   var viewModel: ReviewsPresentationLogic!
 
   init() {
@@ -30,11 +32,13 @@ final class ReviewsViewController: UIViewController {
     reviewsView.setupTableViewConfiguration(with: viewModel)
     viewModel.getReviews()
   }
+  
 }
 
 // MARK: - ReviewsViewDelegate
 
 extension ReviewsViewController: ReviewsDisplayLogic {
+  
   func updateViewSuccess() {
     let state = viewModel.getState()
     reviewsView.reloadTableView()
@@ -44,4 +48,5 @@ extension ReviewsViewController: ReviewsDisplayLogic {
   func updateViewFailure() {
     // TODO: - 
   }
+  
 }

@@ -6,4 +6,5 @@ struct ReviewsViewModelState {
   var offset = 0
   var shouldLoad = true
   var totalReviews: Int = 0
+
 }

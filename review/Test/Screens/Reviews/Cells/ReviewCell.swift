@@ -1,4 +1,12 @@
+
 import UIKit
+
+// MARK: - Typealias
+
+fileprivate typealias Config = ReviewCellConfig
+fileprivate typealias Layout = ReviewCellLayout
+
+// MARK: - ReviewCellConfig
 
 /// Конфигурация ячейки. Содержит данные для отображения в ячейке.
 struct ReviewCellConfig {
@@ -25,6 +33,7 @@ struct ReviewCellConfig {
 
   /// Объект, хранящий посчитанные фреймы для ячейки отзыва.
   fileprivate let layout = ReviewCellLayout()
+
 }
 
 // MARK: - TableCellConfig
@@ -51,6 +60,7 @@ extension ReviewCellConfig: TableCellConfig {
   func height(with size: CGSize) -> CGFloat {
     layout.height(config: self, maxWidth: size.width)
   }
+
 }
 
 // MARK: - Private
@@ -60,6 +70,7 @@ private extension ReviewCellConfig {
   /// Текст кнопки "Показать полностью...".
   static let showMoreText = "Показать полностью..."
     .attributed(font: .showMore, color: .showMore)
+
 }
 
 // MARK: - Cell
@@ -96,6 +107,7 @@ final class ReviewCell: UITableViewCell {
     createdLabel.frame = layout.createdLabelFrame
     showMoreButton.frame = layout.showMoreButtonFrame
   }
+
 }
 
 // MARK: - Private
@@ -140,6 +152,7 @@ private extension ReviewCell {
     showMoreButton.contentVerticalAlignment = .fill
     showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
   }
+
 }
 
 // MARK: - Layout
@@ -149,13 +162,12 @@ private extension ReviewCell {
 private final class ReviewCellLayout {
 
   // MARK: - Размеры
-
-  fileprivate static let avatarSize = CGSize(width: 36.0, height: 36.0)
-  fileprivate static let avatarCornerRadius = 18.0
-  fileprivate static let photoCornerRadius = 8.0
-
+  private static let avatarSize = CGSize(width: 36.0, height: 36.0)
   private static let photoSize = CGSize(width: 55.0, height: 66.0)
   private static let showMoreButtonSize = Config.showMoreText.size()
+
+  fileprivate static let avatarCornerRadius = 18.0
+  fileprivate static let photoCornerRadius = 8.0
 
   // MARK: - Фреймы
 
@@ -170,7 +182,6 @@ private final class ReviewCellLayout {
 
   /// Отступы от краёв ячейки до её содержимого.
   private let insets = UIEdgeInsets(top: 9.0, left: 12.0, bottom: 9.0, right: 12.0)
-
   /// Горизонтальный отступ от аватара до имени пользователя.
   private let avatarToUsernameSpacing = 10.0
   /// Вертикальный отступ от имени пользователя до вью рейтинга.
@@ -193,7 +204,6 @@ private final class ReviewCellLayout {
   /// Возвращает высоту ячейку с данной конфигурацией `config` и ограничением по ширине `maxWidth`.
   func height(config: Config, maxWidth: CGFloat) -> CGFloat {
     var width = maxWidth - insets.left - insets.right
-    
     var maxY = insets.top
     var maxX = insets.left
     var showShowMoreButton = false
@@ -248,17 +258,11 @@ private final class ReviewCellLayout {
     } else {
       showMoreButtonFrame = .zero
     }
-    
     createdLabelFrame = CGRect(
       origin: CGPoint(x: maxX, y: maxY),
       size: config.created.boundingRect(width: width).size
     )
-    
     return createdLabelFrame.maxY + insets.bottom
   }
+
 }
-
-// MARK: - Typealias
-
-fileprivate typealias Config = ReviewCellConfig
-fileprivate typealias Layout = ReviewCellLayout

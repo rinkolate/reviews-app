@@ -1,7 +1,10 @@
+
 import Foundation
 
 protocol ProvidesReviews {
+  
   func getReviews(offset: Int) async throws -> Data
+
 }
 
 /// Класс для загрузки отзывов.
@@ -22,11 +25,13 @@ extension ReviewsProvider {
     case badURL
     case badData(Error)
   }
+
 }
 
 // MARK: - ProvidesReviews
 
 extension ReviewsProvider: ProvidesReviews {
+
   func getReviews(offset: Int = 0) async throws -> Data {
     guard let url = self.bundle.url(
       forResource: "getReviews.response",
@@ -44,4 +49,5 @@ extension ReviewsProvider: ProvidesReviews {
       throw GetReviewsError.badData(error)
     }
   }
+
 }

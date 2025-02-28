@@ -9,4 +9,5 @@ final class ReviewsScreenFactory {
     controller.viewModel = viewModel
     return controller
   }
+  
 }

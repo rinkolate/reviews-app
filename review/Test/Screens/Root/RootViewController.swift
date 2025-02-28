@@ -1,3 +1,4 @@
+
 import UIKit
 
 final class RootViewController: UIViewController {
@@ -7,6 +8,7 @@ final class RootViewController: UIViewController {
   override func loadView() {
     view = rootView
   }
+  
 }
 
 // MARK: - Private
@@ -18,5 +20,6 @@ private extension RootViewController {
     let controller = factory.makeReviewsController()
     navigationController?.pushViewController(controller, animated: true)
   }
+  
 }
 

@@ -1,3 +1,4 @@
+
 import UIKit
 
 struct RatingRendererConfig {
@@ -7,6 +8,7 @@ struct RatingRendererConfig {
   let tintColor: UIColor
   let fadeColor: UIColor
   let spacing: CGFloat
+
 }
 
 // MARK: - Internal
@@ -26,6 +28,7 @@ extension RatingRendererConfig {
       spacing: 1.0
     )
   }
+
 }
 
 // MARK: - Renderer
@@ -46,6 +49,7 @@ final class RatingRenderer {
     self.images = images
     self.imageRenderer = imageRenderer
   }
+
 }
 
 // MARK: - Internal
@@ -64,6 +68,7 @@ extension RatingRenderer {
   func ratingImage(_ rating: Int) -> UIImage {
     images[rating] ?? drawRatingImageAndCache(rating)
   }
+
 }
 
 // MARK: - Private
@@ -89,4 +94,5 @@ private extension RatingRenderer {
     }
     return renderedImage
   }
+
 }

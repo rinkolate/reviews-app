@@ -1,10 +1,12 @@
+
 import UIKit
 
 protocol DisplaysReviews: UIView {
-  
+
   func reloadTableView()
   func setupTableViewConfiguration(with viewModel: ReviewsPresentationLogic)
   func updateFooter(with count: Int)
+
 }
 
 final class ReviewsView: UIView {
@@ -28,17 +30,18 @@ final class ReviewsView: UIView {
     footer.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 50)
     countReviewsLabel.frame = footer.bounds
   }
+
 }
 
 // MARK: - DisplaysReviews
 // TODO: - Просклонять отзывы
 extension ReviewsView: DisplaysReviews {
-  
+
   func setupTableViewConfiguration(with viewModel: ReviewsPresentationLogic) {
     tableView.delegate = viewModel
     tableView.dataSource = viewModel
   }
-  
+
   func reloadTableView() {
     tableView.reloadData()
   }
@@ -47,6 +50,7 @@ extension ReviewsView: DisplaysReviews {
     countReviewsLabel.attributedText = ( "\(count) отзывов")
       .attributed(font: .reviewCount, color: .reviewCount)
   }
+
 }
 
 // MARK: - Private
@@ -67,4 +71,5 @@ private extension ReviewsView {
     tableView.tableFooterView = footer
     countReviewsLabel.textAlignment = .center
   }
+
 }
