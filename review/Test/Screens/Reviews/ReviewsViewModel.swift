@@ -91,7 +91,7 @@ private extension ReviewsViewModel {
     else { return }
     item.maxLines = .zero
     state.items[index] = item
-    //await viewController?.updateView()
+    viewController?.showFullReview(at: index)
   }
 
 }

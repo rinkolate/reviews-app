@@ -6,6 +6,8 @@ protocol ReviewsDisplayLogic: AnyObject {
   func updateViewSuccess()
   @MainActor
   func updateViewFailure()
+  
+  func showFullReview(at index: Int)
 }
 
 final class ReviewsViewController: UIViewController {
@@ -38,6 +40,11 @@ final class ReviewsViewController: UIViewController {
 // MARK: - ReviewsViewDelegate
 
 extension ReviewsViewController: ReviewsDisplayLogic {
+  
+  func showFullReview(at index: Int) {
+    let indexPath = IndexPath(row: index, section: 0)
+    reviewsView.reloadRows(at: [indexPath])
+  }
   
   func updateViewSuccess() {
     let state = viewModel.getState()

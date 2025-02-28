@@ -4,6 +4,7 @@ import UIKit
 protocol DisplaysReviews: UIView {
 
   func reloadTableView()
+  func reloadRows(at indexPaths: [IndexPath])
   func setupTableViewConfiguration(with viewModel: ReviewsPresentationLogic)
   func updateFooter(with count: Int)
 
@@ -36,6 +37,11 @@ final class ReviewsView: UIView {
 // MARK: - DisplaysReviews
 // TODO: - Просклонять отзывы
 extension ReviewsView: DisplaysReviews {
+  
+  func reloadRows(at indexPaths: [IndexPath]) {
+    tableView.reloadRows(at: indexPaths, with: .none)
+  }
+  
 
   func setupTableViewConfiguration(with viewModel: ReviewsPresentationLogic) {
     tableView.delegate = viewModel
