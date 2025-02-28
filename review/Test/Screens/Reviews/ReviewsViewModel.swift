@@ -1,22 +1,29 @@
 import UIKit
 
+protocol ReviewsPresentationLogic: UITableViewDelegate, UITableViewDataSource {
+  func getReviews()
+  func getState() -> ReviewsViewModelState
+}
+
 /// Класс, описывающий бизнес-логику экрана отзывов.
 final class ReviewsViewModel: NSObject {
+  
+  typealias State = ReviewsViewModelState
 
-  /// Замыкание, вызываемое при изменении `state`.
-  var onStateChange: ((State) -> Void)?
-
+  private weak var viewController: ReviewsDisplayLogic?
   private var state: State
-  private let reviewsProvider: ReviewsProvider
+  private let reviewsProvider: ProvidesReviews
   private let ratingRenderer: RatingRenderer
   private let decoder: JSONDecoder
   
   init(
+    viewController: ReviewsDisplayLogic,
+    reviewsProvider: ProvidesReviews,
     state: State = State(),
-    reviewsProvider: ReviewsProvider = ReviewsProvider(),
     ratingRenderer: RatingRenderer = RatingRenderer(),
     decoder: JSONDecoder = JSONDecoder())
   {
+    self.viewController = viewController
     self.state = state
     self.reviewsProvider = reviewsProvider
     self.ratingRenderer = ratingRenderer
@@ -24,18 +31,28 @@ final class ReviewsViewModel: NSObject {
   }
 }
 
-// MARK: - Internal
+// MARK: - ReviewsPresentationLogic
 
-extension ReviewsViewModel {
-
-  typealias State = ReviewsViewModelState
+extension ReviewsViewModel: ReviewsPresentationLogic {
+  
   /// Метод получения отзывов.
-  func getReviews() {
-    guard state.shouldLoad else {
-      return
+  func getReviews() { Task {
+    do {
+      guard state.shouldLoad else {
+        return
+      }
+      state.shouldLoad = false
+      let result = try await reviewsProvider.getReviews(offset: state.offset)
+      gotReviews(result)
+      await viewController?.updateViewSuccess()
+    } catch {
+      await viewController?.updateViewFailure()
     }
-    state.shouldLoad = false
-    reviewsProvider.getReviews(offset: state.offset, completion: gotReviews)
+  }}
+  
+  /// Метод передачи состояния View Model-и
+  func getState() -> ReviewsViewModelState {
+    return state
   }
 }
 
@@ -44,12 +61,10 @@ extension ReviewsViewModel {
 private extension ReviewsViewModel {
 
   /// Метод обработки получения отзывов.
-  func gotReviews(_ result: ReviewsProvider.GetReviewsResult) {
+  func gotReviews(_ result: Data) {
     do {
-      let data = try result.get()
       decoder.keyDecodingStrategy = .convertFromSnakeCase
-      let reviews = try decoder.decode(Reviews.self, from: data)
-      
+      let reviews = try decoder.decode(Reviews.self, from: result)
       state.items += reviews.items.map(makeReviewItem)
       state.offset += state.limit
       state.shouldLoad = state.offset < reviews.count
@@ -57,7 +72,6 @@ private extension ReviewsViewModel {
     } catch {
       state.shouldLoad = true
     }
-    onStateChange?(state)
   }
 
   /// Метод, вызываемый при нажатии на кнопку "Показать полностью...".
@@ -70,7 +84,7 @@ private extension ReviewsViewModel {
     else { return }
     item.maxLines = .zero
     state.items[index] = item
-    onStateChange?(state)
+    //await viewController?.updateView()
   }
 }
 

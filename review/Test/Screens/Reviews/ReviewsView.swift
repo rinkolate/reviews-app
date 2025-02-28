@@ -1,23 +1,13 @@
 import UIKit
 
 protocol DisplaysReviews: UIView {
-  var delegate: ReviewsViewDelegate? { get set }
   
   func reloadTableView()
+  func setupTableViewConfiguration(with viewModel: ReviewsPresentationLogic)
   func updateFooter(with count: Int)
 }
 
-protocol ReviewsViewDelegate: AnyObject {
-  func returnConfiguration() -> ReviewsViewModel
-}
-
 final class ReviewsView: UIView {
-  
-  weak var delegate: ReviewsViewDelegate? {
-    didSet {
-      configureTableView()
-    }
-  }
   
   private let tableView = UITableView()
   private let footer = UIView()
@@ -43,6 +33,11 @@ final class ReviewsView: UIView {
 // MARK: - DisplaysReviews
 // TODO: - Просклонять отзывы
 extension ReviewsView: DisplaysReviews {
+  
+  func setupTableViewConfiguration(with viewModel: ReviewsPresentationLogic) {
+    tableView.delegate = viewModel
+    tableView.dataSource = viewModel
+  }
   
   func reloadTableView() {
     tableView.reloadData()
@@ -71,13 +66,5 @@ private extension ReviewsView {
     footer.addSubview(countReviewsLabel)
     tableView.tableFooterView = footer
     countReviewsLabel.textAlignment = .center
-  }
-  
-  func configureTableView() {
-    guard let delegate else {
-      return
-    }
-    tableView.delegate = delegate.returnConfiguration()
-    tableView.dataSource = delegate.returnConfiguration()
   }
 }

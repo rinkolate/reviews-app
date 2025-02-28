@@ -1,12 +1,18 @@
 import UIKit
 
+protocol ReviewsDisplayLogic: AnyObject {
+  @MainActor
+  func updateViewSuccess()
+  @MainActor
+  func updateViewFailure()
+}
+
 final class ReviewsViewController: UIViewController {
 
   private lazy var reviewsView: DisplaysReviews = ReviewsView()
-  private let viewModel: ReviewsViewModel
+  var viewModel: ReviewsPresentationLogic!
 
-  init(viewModel: ReviewsViewModel) {
-    self.viewModel = viewModel
+  init() {
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -16,34 +22,27 @@ final class ReviewsViewController: UIViewController {
 
   override func loadView() {
     view = reviewsView
-    reviewsView.delegate = self
     title = "Отзывы"
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    setupViewModel()
+    updateViewSuccess()
+    reviewsView.setupTableViewConfiguration(with: viewModel)
     viewModel.getReviews()
   }
 }
 
-extension ReviewsViewController: ReviewsViewDelegate {
-  func returnConfiguration() -> ReviewsViewModel {
-    return viewModel
+// MARK: - ReviewsViewDelegate
+
+extension ReviewsViewController: ReviewsDisplayLogic {
+  func updateViewSuccess() {
+    let state = viewModel.getState()
+    reviewsView.reloadTableView()
+    reviewsView.updateFooter(with: state.totalReviews)
   }
-}
-
-// MARK: - Private
-
-private extension ReviewsViewController {
-    
-  func setupViewModel() {
-    viewModel.onStateChange = { [weak self] state in
-      guard let self else {
-        return
-      }
-      reviewsView.reloadTableView()
-      reviewsView.updateFooter(with: state.totalReviews)
-    }
+  
+  func updateViewFailure() {
+    // TODO: - 
   }
 }
