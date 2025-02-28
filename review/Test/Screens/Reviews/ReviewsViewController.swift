@@ -27,7 +27,6 @@ final class ReviewsViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    updateViewSuccess()
     reviewsView.setupTableViewConfiguration(with: viewModel)
     viewModel.getReviews()
   }

@@ -6,6 +6,7 @@ final class ReviewsScreenFactory {
     let controller = ReviewsViewController()
     let viewModel = ReviewsViewModel(viewController: controller, reviewsProvider: reviewsProvider)
     
+    controller.viewModel = viewModel
     return controller
   }
 }
