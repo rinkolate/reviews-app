@@ -33,6 +33,7 @@ final class ReviewsViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    reviewsView.showLoader()
     reviewsView.setupTableViewConfiguration(with: viewModel)
     viewModel.getReviews()
   }
@@ -43,7 +44,7 @@ final class ReviewsViewController: UIViewController {
 
 extension ReviewsViewController: ReviewsViewDelegate {
 
-  func updateTableView() {
+  func reloadTableView() {
     viewModel.getReviews()
   }
 
@@ -58,12 +59,14 @@ extension ReviewsViewController: ReviewsDisplayLogic {
   }
   
   func updateViewSuccess() {
+    reviewsView.hideLoader()
     let state = viewModel.getState()
     reviewsView.reloadTableView()
     reviewsView.updateFooter(with: state.totalReviews)
   }
   
   func updateViewFailure() {
+    reviewsView.hideLoader()
     // Если вы видите этот комментарий, значит я не успела написать эту логику
     // Но в заданиях этого не было, этот метод создан исключительно из моего желания сделать этот код еще прекраснее :)
     assertionFailure("Что-то пошло не так")

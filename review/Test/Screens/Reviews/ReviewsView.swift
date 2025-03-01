@@ -9,12 +9,14 @@ protocol DisplaysReviews: UIView {
   func reloadRows(at indexPaths: [IndexPath])
   func setupTableViewConfiguration(with viewModel: ReviewsPresentationLogic)
   func updateFooter(with count: Int)
-
+  func showLoader()
+  func hideLoader()
+  
 }
 
 protocol ReviewsViewDelegate: AnyObject {
 
-  func updateTableView()
+  func reloadTableView()
 
 }
 
@@ -26,6 +28,7 @@ final class ReviewsView: UIView {
   private let footer = UIView()
   private let countReviewsLabel = UILabel()
   private let refreshControl = UIRefreshControl()
+  private let loader = UIActivityIndicatorView(style: .large)
 
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
@@ -41,6 +44,7 @@ final class ReviewsView: UIView {
     tableView.frame = bounds.inset(by: safeAreaInsets)
     footer.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 50)
     countReviewsLabel.frame = footer.bounds
+    loader.frame = bounds.inset(by: safeAreaInsets)
   }
 
 }
@@ -67,6 +71,13 @@ extension ReviewsView: DisplaysReviews {
       .attributed(font: .reviewCount, color: .reviewCount)
   }
   
+  func showLoader() {
+    loader.startAnimating()
+  }
+  
+  func hideLoader() {
+    loader.stopAnimating()
+  }
 
 }
 
@@ -78,6 +89,7 @@ private extension ReviewsView {
     backgroundColor = .systemBackground
     setupTableView()
     setupRefreshControl()
+    setupLoader()
   }
 
   func setupTableView() {
@@ -96,9 +108,13 @@ private extension ReviewsView {
       guard let self else {
         return
       }
-      delegate?.updateTableView()
+      delegate?.reloadTableView()
       refreshControl.endRefreshing()
     }, for: .valueChanged)
+  }
+  
+  func setupLoader() {
+    addSubview(loader)
   }
 
 }
