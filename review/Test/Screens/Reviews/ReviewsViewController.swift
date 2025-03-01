@@ -26,11 +26,13 @@ final class ReviewsViewController: UIViewController {
 
   override func loadView() {
     view = reviewsView
+    reviewsView.delegate = self
     title = "Отзывы"
   }
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    
     reviewsView.setupTableViewConfiguration(with: viewModel)
     viewModel.getReviews()
   }
@@ -39,6 +41,15 @@ final class ReviewsViewController: UIViewController {
 
 // MARK: - ReviewsViewDelegate
 
+extension ReviewsViewController: ReviewsViewDelegate {
+
+  func updateTableView() {
+    viewModel.getReviews()
+  }
+
+}
+
+// MARK: - ReviewsDisplayLogic
 extension ReviewsViewController: ReviewsDisplayLogic {
   
   func showFullReview(at index: Int) {
@@ -53,7 +64,9 @@ extension ReviewsViewController: ReviewsDisplayLogic {
   }
   
   func updateViewFailure() {
-    // TODO: - 
+    // Если вы видите этот комментарий, значит я не успела написать эту логику
+    // Но в заданиях этого не было, этот метод создан исключительно из моего желания сделать этот код еще прекраснее :)
+    assertionFailure("Что-то пошло не так")
   }
   
 }

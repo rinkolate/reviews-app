@@ -1,9 +1,11 @@
 
 import Foundation
+import UIKit
 
 protocol ProvidesReviews {
   
   func getReviews(offset: Int) async throws -> Data
+  func loadImage(from urlString: String) async -> UIImage?
 
 }
 
@@ -48,6 +50,26 @@ extension ReviewsProvider: ProvidesReviews {
     } catch {
       throw GetReviewsError.badData(error)
     }
+  }
+  
+  func loadImage(from urlString: String) async -> UIImage? {
+    if let cachedImage = ImageCache.shared.getImage(for: urlString) {
+      return cachedImage
+    }
+    guard let url = URL(string: urlString) else {
+      return nil
+    }
+
+    do {
+      let (data, _) = try await URLSession.shared.data(from: url)
+      if let image = UIImage(data: data) {
+        ImageCache.shared.setImage(image, for: urlString)
+        return image
+      }
+    } catch {
+      assertionFailure("\(error)")
+    }
+    return nil
   }
 
 }

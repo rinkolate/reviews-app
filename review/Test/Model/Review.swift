@@ -1,8 +1,10 @@
 /// Модель отзыва.
 struct Review: Decodable {
-  ///Имя
+  /// Аватар
+  let avatarUrl: String
+  /// Имя
   let firstName: String
-  //Фамилия
+  // Фамилия
   let lastName: String
   /// Рейтинг
   let rating: Int

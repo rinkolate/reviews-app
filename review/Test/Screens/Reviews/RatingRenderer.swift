@@ -75,6 +75,7 @@ extension RatingRenderer {
 
 private extension RatingRenderer {
 
+  // TODO: Пуру пуру пу какие-то проблемы с потокобезопасностью
   func drawRatingImageAndCache(_ rating: Int) -> UIImage {
     let ratingImage = drawRatingImage(rating)
     images[rating] = ratingImage

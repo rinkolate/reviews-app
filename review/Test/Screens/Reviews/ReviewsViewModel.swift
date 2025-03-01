@@ -49,7 +49,7 @@ extension ReviewsViewModel: ReviewsPresentationLogic {
       }
       state.shouldLoad = false
       let result = try await reviewsProvider.getReviews(offset: state.offset)
-      gotReviews(result)
+      await gotReviews(result)
       await viewController?.updateViewSuccess()
     } catch {
       await viewController?.updateViewFailure()
@@ -68,11 +68,25 @@ extension ReviewsViewModel: ReviewsPresentationLogic {
 private extension ReviewsViewModel {
 
   /// Метод обработки получения отзывов.
-  func gotReviews(_ result: Data) {
+  func gotReviews(_ result: Data) async {
     do {
       decoder.keyDecodingStrategy = .convertFromSnakeCase
       let reviews = try decoder.decode(Reviews.self, from: result)
-      state.items += reviews.items.map(makeReviewItem)
+
+      /// Параллельная загрузка отзывов через TaskGroup
+      var items = Array<ReviewItem?>(repeating: nil, count: reviews.items.count)
+      await withTaskGroup(of: (Int, ReviewItem).self) { group in
+        for (index, review) in reviews.items.enumerated() {
+          group.addTask {
+            let item = await self.makeReviewItem(review)
+            return (index, item)
+          }
+        }
+        for await (index, item) in group {
+          items[index] = item
+        }
+      }
+      state.items += items.compactMap { $0 }
       state.offset += state.limit
       state.shouldLoad = state.offset < reviews.count
       state.totalReviews = state.shouldLoad ? state.offset : reviews.count
@@ -102,22 +116,20 @@ private extension ReviewsViewModel {
 
   typealias ReviewItem = ReviewCellConfig
 
-  func makeReviewItem(_ review: Review) -> ReviewItem {
+  func makeReviewItem(_ review: Review) async -> ReviewItem {
+    let avatar = await reviewsProvider.loadImage(from: review.avatarUrl) ?? .avatar
     let userName = (review.firstName + " " + review.lastName).attributed(font: .username)
     let rating = ratingRenderer.ratingImage(review.rating)
     let reviewText = review.text.attributed(font: .text)
     let created = review.created.attributed(font: .created, color: .created)
     let item = ReviewItem(
-      avatar: .avatar,
+      avatar: avatar,
       userName: userName,
       rating: rating,
       reviewText: reviewText,
       created: created,
       onTapShowMore: { [weak self] id in
-        guard let self else {
-          return
-        }
-        self.showMoreReview(with: id)
+        self?.showMoreReview(with: id)
       }
     )
     return item
