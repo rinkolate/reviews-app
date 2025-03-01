@@ -22,6 +22,8 @@ struct ReviewCellConfig {
   let userName: NSAttributedString
   /// Оценка пользователя
   let rating: UIImage
+  /// Фото отзыва
+  let reviewImages: [UIImage]
   /// Текст отзыва.
   let reviewText: NSAttributedString
   /// Максимальное отображаемое количество строк текста. По умолчанию 3.
@@ -49,6 +51,9 @@ extension ReviewCellConfig: TableCellConfig {
     cell.avatarImage.image = avatar
     cell.userNameLabel.attributedText = userName
     cell.ratingImage.image = rating
+    cell.reviewImages.dataSource = cell.self
+    cell.reviewImages.delegate = cell.self
+    cell.reviewImages.reloadData()
     cell.reviewTextLabel.attributedText = reviewText
     cell.reviewTextLabel.numberOfLines = maxLines
     cell.createdLabel.attributedText = created
@@ -85,7 +90,17 @@ final class ReviewCell: UITableViewCell {
   fileprivate let reviewTextLabel = UILabel()
   fileprivate let createdLabel = UILabel()
   fileprivate let showMoreButton = UIButton()
-
+  fileprivate let reviewImages: UICollectionView = {
+    let layout = UICollectionViewFlowLayout()
+    layout.scrollDirection = .horizontal
+    layout.minimumLineSpacing = Layout.photosSpacing
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    collectionView.showsHorizontalScrollIndicator = false
+    collectionView.backgroundColor = .clear
+    collectionView.register(ReviewPhotoCell.self, forCellWithReuseIdentifier: "ReviewPhotoCell")
+    return collectionView
+  }()
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -103,6 +118,7 @@ final class ReviewCell: UITableViewCell {
     avatarImage.frame = layout.avatarImageViewFrame
     userNameLabel.frame = layout.userNameLabelFrame
     ratingImage.frame = layout.ratingViewFrame
+    reviewImages.frame = layout.reviewImagesFrame
     reviewTextLabel.frame = layout.reviewTextLabelFrame
     createdLabel.frame = layout.createdLabelFrame
     showMoreButton.frame = layout.showMoreButtonFrame
@@ -121,11 +137,12 @@ private extension ReviewCell {
     setupReviewTextLabel()
     setupCreatedLabel()
     setupShowMoreButton()
+    setupReviewImages()
   }
 
   func setupAvatarImage() {
     contentView.addSubview(avatarImage)
-    avatarImage.layer.cornerRadius =  ReviewCellLayout.avatarCornerRadius
+    avatarImage.layer.cornerRadius =  Layout.avatarCornerRadius
     avatarImage.clipsToBounds = true
   }
 
@@ -158,7 +175,10 @@ private extension ReviewCell {
     showMoreButton.contentVerticalAlignment = .fill
     showMoreButton.setAttributedTitle(Config.showMoreText, for: .normal)
   }
-
+  
+    func setupReviewImages() {
+      contentView.addSubview(reviewImages)
+    }
 }
 
 // MARK: - Layout
@@ -169,16 +189,16 @@ private final class ReviewCellLayout {
 
   // MARK: - Размеры
   private static let avatarSize = CGSize(width: 36.0, height: 36.0)
-  private static let photoSize = CGSize(width: 55.0, height: 66.0)
   private static let showMoreButtonSize = Config.showMoreText.size()
-
+  
+  fileprivate static let photoSize = CGSize(width: 55.0, height: 66.0)
   fileprivate static let avatarCornerRadius = 18.0
-  fileprivate static let photoCornerRadius = 8.0
 
   // MARK: - Фреймы
 
   private(set) var avatarImageViewFrame = CGRect.zero
   private(set) var userNameLabelFrame = CGRect.zero
+  private(set) var reviewImagesFrame = CGRect.zero
   private(set) var ratingViewFrame = CGRect.zero
   private(set) var reviewTextLabelFrame = CGRect.zero
   private(set) var showMoreButtonFrame = CGRect.zero
@@ -196,14 +216,14 @@ private final class ReviewCellLayout {
   private let ratingToTextSpacing = 6.0
   /// Вертикальный отступ от вью рейтинга до фото.
   private let ratingToPhotosSpacing = 10.0
-  /// Горизонтальные отступы между фото.
-  private let photosSpacing = 8.0
   /// Вертикальный отступ от фото (если они есть) до текста отзыва.
   private let photosToTextSpacing = 10.0
   /// Вертикальный отступ от текста отзыва до времени создания отзыва или кнопки "Показать полностью..." (если она есть).
   private let reviewTextToCreatedSpacing = 6.0
   /// Вертикальный отступ от кнопки "Показать полностью..." до времени создания отзыва.
   private let showMoreToCreatedSpacing = 6.0
+  /// Горизонтальные отступы между фото.
+  fileprivate static let photosSpacing = 8.0
 
   // MARK: - Расчёт фреймов и высоты ячейки
 
@@ -239,6 +259,19 @@ private final class ReviewCellLayout {
     
     maxY = ratingViewFrame.maxY + ratingToTextSpacing
     
+    if !config.reviewImages.isEmpty {
+        
+      let photosWidth = CGFloat(config.reviewImages.count)
+      * (Layout.photoSize.width + Layout.photosSpacing)
+      - Layout.photosSpacing
+      reviewImagesFrame = CGRect(
+        origin: CGPoint(x: maxX, y: maxY),
+        size: CGSize(width: photosWidth, height: Layout.photoSize.height)
+      )
+      
+      maxY = reviewImagesFrame.maxY + photosToTextSpacing
+    }
+    
     if !config.reviewText.isEmpty() {
       // Высота текста с текущим ограничением по количеству строк.
       let currentTextHeight = (config.reviewText.font()?.lineHeight ?? .zero)
@@ -271,4 +304,41 @@ private final class ReviewCellLayout {
     return createdLabelFrame.maxY + insets.bottom
   }
 
+}
+
+// MARK: - UICollectionViewDataSource
+
+extension ReviewCell: UICollectionViewDataSource {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    numberOfItemsInSection section: Int)
+  -> Int {
+    return config?.reviewImages.count ?? 0
+  }
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    cellForItemAt indexPath: IndexPath)
+  -> UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: "ReviewPhotoCell",
+      for: indexPath) as? ReviewPhotoCell,
+          let image = config?.reviewImages[indexPath.item] else {
+      return UICollectionViewCell()
+    }
+    cell.imageView.image = image
+    return cell
+  }
+}
+
+// MARK: - UICollectionViewDelegateFlowLayout
+
+extension ReviewCell: UICollectionViewDelegateFlowLayout {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    sizeForItemAt indexPath: IndexPath
+  ) -> CGSize {
+    return Layout.photoSize
+  }
 }

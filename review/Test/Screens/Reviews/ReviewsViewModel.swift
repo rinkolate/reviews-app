@@ -122,10 +122,12 @@ private extension ReviewsViewModel {
     let rating = ratingRenderer.ratingImage(review.rating)
     let reviewText = review.text.attributed(font: .text)
     let created = review.created.attributed(font: .created, color: .created)
+    let reviewImages = await loadReviewImages(review)
     let item = ReviewItem(
       avatar: avatar,
       userName: userName,
       rating: rating,
+      reviewImages: reviewImages,
       reviewText: reviewText,
       created: created,
       onTapShowMore: { [weak self] id in
@@ -133,6 +135,24 @@ private extension ReviewsViewModel {
       }
     )
     return item
+  }
+  
+  func loadReviewImages(_ review: Review) async -> [UIImage] {
+    guard let photos = review.photoUrls, !photos.isEmpty else {
+      return []
+    }
+    return await withTaskGroup(of: UIImage?.self) { group in
+      for url in photos {
+        group.addTask { [weak self] in
+          await self?.reviewsProvider.loadImage(from: url)
+        }
+      }
+      var images: [UIImage] = []
+      for await image in group.compactMap({ $0 }) {
+        images.append(image)
+      }
+      return images
+    }
   }
 
 }

@@ -28,6 +28,7 @@
 		21ED1F622D69CBCD0012D6F6 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED1F612D69CBCD0012D6F6 /* RootView.swift */; };
 		21ED1F652D69D0340012D6F6 /* ReviewsScreenFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */; };
 		4BE4C6AB2D734EFB00036CD4 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4C6AA2D734EED00036CD4 /* ImageCache.swift */; };
+		4BE4C6AD2D7391F500036CD4 /* ReviewPhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE4C6AC2D7391E600036CD4 /* ReviewPhotoCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		21ED1F612D69CBCD0012D6F6 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		21ED1F642D69D0340012D6F6 /* ReviewsScreenFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewsScreenFactory.swift; sourceTree = "<group>"; };
 		4BE4C6AA2D734EED00036CD4 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		4BE4C6AC2D7391E600036CD4 /* ReviewPhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPhotoCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +88,7 @@
 		216668752D48F39E009AAA76 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				4BE4C6AC2D7391E600036CD4 /* ReviewPhotoCell.swift */,
 				21B82E252D47B0640085DAA2 /* ReviewCell.swift */,
 			);
 			path = Cells;
@@ -271,6 +274,7 @@
 				216668712D48E4B2009AAA76 /* NSAttributedString+Ext.swift in Sources */,
 				21B82E362D47B0D80085DAA2 /* ReviewsProvider.swift in Sources */,
 				21ED1F602D69C85E0012D6F6 /* RootViewController.swift in Sources */,
+				4BE4C6AD2D7391F500036CD4 /* ReviewPhotoCell.swift in Sources */,
 				21B82E342D47B0AA0085DAA2 /* ReviewsViewModel.swift in Sources */,
 				4BE4C6AB2D734EFB00036CD4 /* ImageCache.swift in Sources */,
 				21B8416B2D47BFA10085DAA2 /* Reviews.swift in Sources */,
