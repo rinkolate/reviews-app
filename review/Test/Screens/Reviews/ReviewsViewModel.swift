@@ -119,7 +119,7 @@ private extension ReviewsViewModel {
   func makeReviewItem(_ review: Review) async -> ReviewItem {
     let avatar = await reviewsProvider.loadImage(from: review.avatarUrl) ?? .avatar
     let userName = (review.firstName + " " + review.lastName).attributed(font: .username)
-    let rating = ratingRenderer.ratingImage(review.rating)
+    let rating = await ratingRenderer.ratingImage(review.rating)
     let reviewText = review.text.attributed(font: .text)
     let created = review.created.attributed(font: .created, color: .created)
     let reviewImages = await loadReviewImages(review)

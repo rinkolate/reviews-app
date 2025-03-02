@@ -11,6 +11,20 @@ struct RatingRendererConfig {
 
 }
 
+// MARK: - Actor
+
+actor ImageCacheActor {
+    private var images: [Int: UIImage] = [:]
+    
+    func image(for rating: Int) -> UIImage? {
+        images[rating]
+    }
+    
+    func setImage(_ image: UIImage, for rating: Int) {
+        images[rating] = image
+    }
+}
+
 // MARK: - Internal
 
 extension RatingRendererConfig {
@@ -37,16 +51,14 @@ extension RatingRendererConfig {
 final class RatingRenderer {
 
   private let config: RatingRendererConfig
-  private var images: [Int: UIImage]
+  private let cache = ImageCacheActor()
   private let imageRenderer: UIGraphicsImageRenderer
 
   init(
     config: RatingRendererConfig,
-    images: [Int: UIImage],
     imageRenderer: UIGraphicsImageRenderer)
   {
     self.config = config
-    self.images = images
     self.imageRenderer = imageRenderer
   }
 
@@ -62,11 +74,14 @@ extension RatingRenderer {
       * CGFloat(config.ratingRange.upperBound) - config.spacing,
       height: config.starImage.size.height
     )
-    self.init(config: config, images: [:], imageRenderer: UIGraphicsImageRenderer(size: size))
+    self.init(config: config, imageRenderer: UIGraphicsImageRenderer(size: size))
   }
 
-  func ratingImage(_ rating: Int) -> UIImage {
-    images[rating] ?? drawRatingImageAndCache(rating)
+  func ratingImage(_ rating: Int) async -> UIImage {
+    if let cachedImage = await cache.image(for: rating) {
+      return cachedImage
+    }
+    return await drawRatingImageAndCache(rating)
   }
 
 }
@@ -75,17 +90,16 @@ extension RatingRenderer {
 
 private extension RatingRenderer {
 
-  // TODO: Пуру пуру пу какие-то проблемы с потокобезопасностью
-  func drawRatingImageAndCache(_ rating: Int) -> UIImage {
-    let ratingImage = drawRatingImage(rating)
-    images[rating] = ratingImage
+  func drawRatingImageAndCache(_ rating: Int) async -> UIImage {
+    let ratingImage = await drawRatingImage(rating)
+    await cache.setImage(ratingImage, for: rating)
     return ratingImage
   }
 
-  func drawRatingImage(_ rating: Int) -> UIImage {
+  func drawRatingImage(_ rating: Int) async -> UIImage {
     let tintedStarImage = config.starImage.withTintColor(config.tintColor)
     let fadedStarImage = config.starImage.withTintColor(config.fadeColor)
-    let renderedImage = imageRenderer.image { _ in
+    return imageRenderer.image { _ in
       var origin = CGPoint.zero
       for value in config.ratingRange {
         let starImage = value <= rating ? tintedStarImage : fadedStarImage
@@ -93,7 +107,6 @@ private extension RatingRenderer {
         origin.x += config.starImage.size.width + config.spacing
       }
     }
-    return renderedImage
   }
 
 }
